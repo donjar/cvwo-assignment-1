@@ -27,3 +27,7 @@ if (strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE') !== FALSE) {
 <?php
 }
 ?>
+
+<?php
+echo $_SERVER['SERVER_NAME'];
+?>
