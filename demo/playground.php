@@ -13,3 +13,5 @@ foreach ($an_array as $key => $value) {
 	echo ($key * $key);
 	echo "<br/>";
 }
+
+echo "ab"."cd"."ef";
