@@ -45,8 +45,7 @@ class Database {
 			$bind_names[] = &$$bind_name;
 		}
 
-		if (!call_user_func_array(array($stmt, "bind_param"),
-			array_merge(array($types), $bind_names))) {
+		if (!call_user_func_array(array($stmt, "bind_param"), array_merge(array($types), $bind_names))) {
 			return false;
 		}
 
@@ -87,8 +86,7 @@ class Database {
 			$bind_names[] = &$$bind_name;
 		}
 
-		if (!call_user_func_array(array($stmt, "bind_param"),
-			array_merge(array($types), $bind_names))) {
+		if (!call_user_func_array(array($stmt, "bind_param"), array_merge(array($types), $bind_names))) {
 			return false;
 		}
 
