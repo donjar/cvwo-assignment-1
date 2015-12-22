@@ -1,5 +1,7 @@
 <?php
 
+require_once('/config/config.php');
+
 class Database {
 
 	protected static $connection;
@@ -8,8 +10,7 @@ class Database {
 	// Establish the connection first, if it's not set.
 	public function connect() {
 		if (!isset(self::$connection)) {
-			$config = parse_ini_file('db.ini');
-			self::$connection = @new mysqli($config['hostname'], $config['username'], $config['password'], $config['dbname']);
+			self::$connection = @new mysqli(db_hostname, db_username, db_password, db_dbname);
 		}
 
 		if (self::$connection->connect_error) {
@@ -90,12 +91,16 @@ class Database {
 			return false;
 		}
 
-		$result = $stmt->execute();
+		if (!($stmt->execute())) {
+			return false;
+		}
 
+		$result = $stmt->get_result();
 		if (!$result) {
 			return false;
 		} else {
-			while ($row = $stmt->fetch_assoc()) {
+			$rows = [];
+			while ($row = $result->fetch_assoc()) {
 				$rows[] = $row;
 			}
 		}
@@ -103,6 +108,31 @@ class Database {
 		$stmt->close();
 		return $rows;
 	}
-}
 
-?>
+	// simple_query, only it fetches.
+	public function simple_fetch($stmt_string) {
+		if (!($conn = $this->connect())) {
+			return false;
+		}
+
+		if (!($stmt = $conn->prepare($stmt_string))) {
+			return false;
+		}
+
+		if (!$stmt->execute()) {
+			return false;
+		}
+
+		$result = $stmt->get_result();
+		if (!$result) {
+			return false;
+		} else {
+			$rows = [];
+			while ($row = $result->fetch_assoc()) {
+				$rows[] = $row;
+			}
+		}
+
+		return $rows;
+	}
+}
