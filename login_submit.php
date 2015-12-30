@@ -2,7 +2,8 @@
 
 session_start();
 
-require_once("config/config.php");
+require_once('config/config.php');
+require_once(DIR_COMMON . 'common.php');
 require_once(DIR_DATABASE . "mysqli-db-obj.php");
 
 // There are so many ways this can go wrong. Assume it is wrong first.
@@ -38,11 +39,11 @@ if (!isset($_POST["username"], $_POST["password"], $_POST["form_token"]) || $_PO
 			$got_pass = $result[0]['password'];
 			if (password_verify($unencrypted_pass, $got_pass)) {
 				$something_wrong = false;
+				header('refresh: 3; url = index.php');
 				$message = "You have successfully logged in.";
-				$_SESSION['username'] = $username;
+				$_SESSION['username'] = $result[0]['username'];
 				$_SESSION['user_id'] = $result[0]['ID'];
-				// Temporary
-				$message .= "<br /> <a href='index.php'>Index</a>";
+				$message .= "<br /> <a href='index.php'>Click here if you are not redirected.</a>";
 			} else {
 				$message = "Username and password does not match. Please try again.";
 			}
@@ -54,26 +55,31 @@ if ($something_wrong) {
 	$message .= "<br /> <a href='login.php'>Re-login</a>";
 }
 
+// Form the navbar
+$navbar = "<a class='blog-nav-item' href='index.php'>Home</a>";
+$navbar .= "<a class='blog-nav-item active' href='login.php'>Login</a>";
+$navbar .= "<a class='blog-nav-item' href='register.php'>Register</a>";
+
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang='en'>
 	<head>
-		<meta charset="utf-8">
-		<meta http-equiv="X-UA-Compatible" content="IE=edge">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta charset='utf-8'>
+		<meta http-equiv='X-UA-Compatible' content='IE=edge'>
+		<meta name='viewport' content='width=device-width, initial-scale=1'>
 		
-		<title>Login to Bloghub</title>
+		<title>Bloghub</title>
 
-		<link href="css/form.css" rel="stylesheet">
-		<link href="css/global.css" rel="stylesheet">
-		<link href="css/bootstrap.min.css" rel="stylesheet">
+		<link href='css/global.css' rel='stylesheet'>
+		<link href='css/bootstrap.min.css' rel='stylesheet'>
 	</head>
+
 	<body>
-		<p><?php echo $message; ?></p>
-		
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-		<script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
-		<script src="js/bootstrap.min.js"></script>
+		<?php echo site_header($navbar); ?>
+		<div class="col-sm-8 blog-main">
+			<p><?php echo $message; ?></p>
+		</div><!-- /.blog-main -->
+		<?php echo $footer; ?>
 	</body>
 </html>

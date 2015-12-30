@@ -11,21 +11,23 @@ $something_wrong = true;
 
 // Variables must have been set and token form must be valid.
 // Generate a generic error if not (else what error should I produce lol)
-if (!isset($_POST["title"], $_POST["contents"], $_POST["form_token"], $_SESSION['user_id']) || $_POST["form_token"] !== $_SESSION["form_token"]) {
+if (!isset($_POST["title"], $_POST["contents"], $_POST["form_token"], $_POST["post_id"], $_SESSION['user_id']) || $_POST["form_token"] !== $_SESSION["form_token"]) {
 	$message = "An error has occured. Please try again.";
 } else {
-	$user_id = $_SESSION['user_id'];
+	$post_id = $_POST['post_id'];
 	$title = $_POST['title'];
 	$contents = $_POST['contents'];
 	$db = new Database();
 
-	$stmt = "INSERT INTO _posts (User_ID, Title, Contents) VALUES (?, ?, ?)";
-	$types = "sss";
-	$array_of_binds = array($user_id, $title, $contents);
+	$stmt = "UPDATE _posts
+	SET Title = ?, Contents = ?
+	WHERE Post_ID = ?";
+	$types = "ssi";
+	$array_of_binds = array($title, $contents, $post_id);
 	if ($db->query($stmt, $types, $array_of_binds)) {
 		$something_wrong = false;
 		header('refresh: 3; url = index.php');
-		$message = "Post has been successfully added!";
+		$message = "Post has been successfully edited!";
 		$message .= "<br /> <a href='index.php'>Click here if you are not redirected.</a>";
 	} else {
 		$message = $db->error();
@@ -33,12 +35,12 @@ if (!isset($_POST["title"], $_POST["contents"], $_POST["form_token"], $_SESSION[
 }
 
 if ($something_wrong) {
-	$message .= "<br /> <a href='addpost.php'>Re-add post</a>";
+	$message .= "<br /> <a href='editpost.php'>Re-edit post</a>";
 }
 
 // Form the navbar
 $navbar = "<a class='blog-nav-item' href='index.php'>Home</a>";
-$navbar .= "<a class='blog-nav-item active' href='addpost.php'>Add Post</a>";
+$navbar .= "<a class='blog-nav-item' href='addpost.php'>Add Post</a>";
 $navbar .= "<a class='blog-nav-item' href='logout.php'>Logout</a>";
 ?>
 

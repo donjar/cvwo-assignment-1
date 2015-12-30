@@ -2,7 +2,8 @@
 
 session_start();
 
-require_once("config/config.php");
+require_once('config/config.php');
+require_once(DIR_COMMON . 'common.php');
 require_once(DIR_DATABASE . "mysqli-db-obj.php");
 
 // There are so many ways this can go wrong. Assume it is wrong first.
@@ -36,7 +37,7 @@ if (!isset($_POST["email"], $_POST["username"], $_POST["password"], $_POST["repa
 		$pass = password_hash($unencrypted_pass, PASSWORD_DEFAULT);
 		$db = new Database();
 
-		// Is the username already there?
+		// Is the username or e-mail already there?
 		$check_stmt = "SELECT * FROM _users
 		WHERE username = ? OR email = ?;";
 		$check_types = "ss";
@@ -58,9 +59,9 @@ if (!isset($_POST["email"], $_POST["username"], $_POST["password"], $_POST["repa
 
 			if ($db->query($stmt, $types, $array_of_binds)) {
 				$something_wrong = false;
-				$message = "An e-mail has been sent to your e-mail address. Please click the link inside the e-mail to verify your e-mail address.";
-				// Temporary
-				$message .= "<br /> <a href='login.php'>Login</a>";
+				header('refresh: 3; url = index.php');
+				$message = "You have successfully registered!";
+				$message .= "<br /> <a href='index.php'>Click here if you are not redirected.</a>";
 			} else {
 				$message = $db->error();
 			}
@@ -72,26 +73,30 @@ if ($something_wrong) {
 	$message .= "<br /> <a href='register.php'>Re-register</a>";
 }
 
+// Form the navbar
+$navbar = "<a class='blog-nav-item' href='index.php'>Home</a>";
+$navbar .= "<a class='blog-nav-item' href='login.php'>Login</a>";
+$navbar .= "<a class='blog-nav-item active' href='register.php'>Register</a>";
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang='en'>
 	<head>
-		<meta charset="utf-8">
-		<meta http-equiv="X-UA-Compatible" content="IE=edge">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta charset='utf-8'>
+		<meta http-equiv='X-UA-Compatible' content='IE=edge'>
+		<meta name='viewport' content='width=device-width, initial-scale=1'>
 		
-		<title>Register to Bloghub</title>
+		<title>Bloghub</title>
 
-		<link href="css/form.css" rel="stylesheet">
-		<link href="css/global.css" rel="stylesheet">
-		<link href="css/bootstrap.min.css" rel="stylesheet">
+		<link href='css/global.css' rel='stylesheet'>
+		<link href='css/bootstrap.min.css' rel='stylesheet'>
 	</head>
-	<body>
-		<p><?php echo $message; ?></p>
 
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-		<script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
-		<script src="js/bootstrap.min.js"></script>
+	<body>
+		<?php echo site_header($navbar); ?>
+		<div class="col-sm-8 blog-main">
+			<p><?php echo $message; ?></p>
+		</div><!-- /.blog-main -->
+		<?php echo $footer; ?>
 	</body>
 </html>

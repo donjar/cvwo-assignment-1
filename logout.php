@@ -1,4 +1,7 @@
 <?php
+require_once('config/config.php');
+require_once(DIR_COMMON . 'common.php');
+
 // Initialize the session.
 session_start();
 
@@ -14,28 +17,34 @@ if (ini_get("session.use_cookies")) {
 
 // Finally, destroy the session.
 session_destroy();
+
+header('refresh: 3; url = index.php');
+
+// Form the site, according to whether one is logged or not
+$navbar = "<a class='blog-nav-item' href='index.php'>Home</a>";
+$navbar .= "<a class='blog-nav-item' href='login.php'>Login</a>";
+$navbar .= "<a class='blog-nav-item' href='register.php'>Register</a>";
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang='en'>
 	<head>
-		<meta charset="utf-8">
-		<meta http-equiv="X-UA-Compatible" content="IE=edge">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta charset='utf-8'>
+		<meta http-equiv='X-UA-Compatible' content='IE=edge'>
+		<meta name='viewport' content='width=device-width, initial-scale=1'>
 		
-		<title>Logout</title>
+		<title>Bloghub</title>
 
-		<link href="css/form.css" rel="stylesheet">
-		<link href="css/global.css" rel="stylesheet">
-		<link href="css/bootstrap.min.css" rel="stylesheet">
+		<link href='css/global.css' rel='stylesheet'>
+		<link href='css/bootstrap.min.css' rel='stylesheet'>
 	</head>
 
 	<body>
-		<p>You are now logged out.</p>
-		<a href="index.php">Go back</a>
-		
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-		<script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
-		<script src="js/bootstrap.min.js"></script>
+		<?php echo site_header($navbar); ?>
+		<div class="col-sm-8 blog-main">
+			<p>You are now logged out.</p>
+			<a href="index.php">Click here if you are not redirected.</a>
+		</div><!-- /.blog-main -->
+		<?php echo $footer; ?>
 	</body>
 </html>

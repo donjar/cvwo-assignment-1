@@ -4,8 +4,13 @@ body {
   background-color: #eee;
 }
 
+/* For the textarea in addpost.php */
+textarea {
+  resize: vertical;
+}
+
 .form-signin {
-  max-width: 330px;
+  max-width: 430px;
   padding: 15px;
   margin: 0 auto;
 }
@@ -36,4 +41,8 @@ body {
 
 #form-submit {
   margin-top: 10px;
+}
+
+#form-addpost {
+  max-width: none;
 }

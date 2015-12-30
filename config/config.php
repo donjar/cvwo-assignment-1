@@ -6,6 +6,7 @@ define('DIR_CSS', DIR_ROOT . 'css/');
 define('DIR_FONTS', DIR_ROOT . 'fonts/');
 define('DIR_JS', DIR_ROOT . 'js/');
 define('DIR_CONFIG', DIR_ROOT . 'config/');
+define('DIR_COMMON', DIR_ROOT . 'common/');
 
 define('db_hostname', 'localhost');
 define('db_username', 'username');
