@@ -22,16 +22,25 @@ Title,
 DATE_FORMAT(Time, '%e %b %Y %T') AS Date,
 Contents FROM _posts";
 
+$types = '';
+$array_of_binds = [];
+
 if ($query_array !== []) {
 	$condition_stmt = " WHERE";
 
 	foreach ($query_array as $key => $value) {
 		if ($key === 'Month') {
-			$condition_stmt .= " DATE_FORMAT(Time, '%M') = '$value' AND";
+			$condition_stmt .= " DATE_FORMAT(Time, '%M') = ? AND";
+			$types .= 's';
+			$array_of_binds[] = $value;
 		} elseif ($key === 'Year') {
-			$condition_stmt .= " DATE_FORMAT(Time, '%Y') = '$value' AND";
+			$condition_stmt .= " DATE_FORMAT(Time, '%Y') = ? AND";
+			$types .= 'i';
+			$array_of_binds[] = $value;
 		} elseif ($key !== 'start') {
-			$condition_stmt .= " $key = '$value' AND";
+			$condition_stmt .= " $key = ? AND";
+			$types .= 'i';
+			$array_of_binds[] = $value;
 		}
 	}
 
@@ -44,10 +53,16 @@ $stmt .= " ORDER BY Time DESC LIMIT 5";
 $start = 0;
 if (isset($query_array['start'])) {
 	$start = $query_array['start'];
-	$stmt .= ' OFFSET ' . $start;
+	$stmt .= ' OFFSET ?';
+	$types .= 'i';
+	$array_of_binds[] = $start;
 }
 
-$result = $db->simple_fetch($stmt);
+if ($types === '') {
+	$result = $db->simple_fetch($stmt);
+} else {
+	$result = $db->fetch($stmt, $types, $array_of_binds);
+}
 
 // Form the navbar accordingly
 if ($logged) {
@@ -62,6 +77,24 @@ if ($logged) {
 
 // Form the main contents
 $main = "";
+
+// Display heading of user's posts, if requested
+$username_stmt = "SELECT username FROM _users
+WHERE ID = ?;";
+$username_types = "i";
+
+if (isset($query_array['User_ID'])) {
+	$username_array_of_binds = array($query_array['User_ID']);
+	$username_array = $db->fetch($username_stmt, $username_types, $username_array_of_binds);
+	$username = $username_array[0]['username'];
+	$main .= "<h2>Posts by " . $username . "</h2>";
+}
+
+// Display heading of certain month, if requested
+if (isset($query_array['Month'], $query_array['Year'])) {
+	$main .= "<h2>Posts made in " . $query_array['Month'] . " " . $query_array['Year'] . "</h2>";
+}
+
 foreach ($result as $key => $value) {
 	$each_post_id = $value['Post_ID'];
 	$post_user_id = $value['User_ID'];
@@ -72,9 +105,8 @@ foreach ($result as $key => $value) {
 	
 	$title_with_link = query_in_link('Post_ID', $each_post_id, $title);
 
-	$username_stmt = "SELECT username FROM _users
-	WHERE ID = $post_user_id;";
-	$username_array = $db->simple_fetch($username_stmt);
+	$username_array_of_binds = array($post_user_id);
+	$username_array = $db->fetch($username_stmt, $username_types, $username_array_of_binds);
 	$username = $username_array[0]['username'];
 
 	$username_with_link = query_in_link('User_ID', $post_user_id, $username);
@@ -82,23 +114,17 @@ foreach ($result as $key => $value) {
 	$main .= "<div class='blog-post'>";
 	$main .= "<h2 class='blog-post-title dont-break-out'>$title_with_link</h2>";
 	$main .= "<p class='blog-post-meta'>$date by $username_with_link</p>";
-	$main .= "<p class='dont-break-out'>$contents</p>";
+	$main .= "<div class='dont-break-out'>$contents</div>";
 	$main .= "</div>";
 }
 
 // If only the Post ID is selected and username matches, allow post modification
 if (isset($query_array['Post_ID'], $_SESSION['user_id']) && $_SESSION['user_id'] === $post_user_id) {
-	$contents_to_be_sent = htmlspecialchars(htmlspecialchars(str_replace("\n", '<br />',$unparsed_contents)));
 	// Remove the </div>
 	$main = substr($main, 0, -6);
 	$main .= '
-			<form action="editpost.php" method="post">
-				<input type="hidden" name="Post_ID" value=' . $each_post_id . ' />
-				<input type="hidden" name="Title" value=' . $title . ' />
-				<input type="hidden" name="Contents" value=' . $contents_to_be_sent . ' />
-				<button class="btn btn-default" type="submit">Edit Post</button>
-				<button type="button" class="btn btn-danger" onclick="return delete_post()" href="delete.php">Delete post</button>
-			</form>
+			<a class="btn btn-default" href="editpost.php?Post_ID=' . $query_array['Post_ID'] . '">Edit Post</a>
+			<a class="btn btn-danger" onclick="return delete_post()">Delete post</a>
 	';
 	$main .= "</div>";
 }

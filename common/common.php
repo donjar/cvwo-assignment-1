@@ -15,7 +15,8 @@ if (isset($_SESSION['username'])) {
 $date_stmt = "SELECT DISTINCT DATE_FORMAT(Time, '%M %Y') AS Date,
 DATE_FORMAT(Time, '%M') AS Month,
 DATE_FORMAT(Time, '%Y') AS Year
-FROM _posts";
+FROM _posts
+ORDER BY Date DESC";
 $date_result = $db->simple_fetch($date_stmt);
 
 $dates_sidebar = "";
