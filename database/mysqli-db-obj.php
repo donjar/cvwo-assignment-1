@@ -6,7 +6,7 @@ class Database {
 
 	protected static $connection;
 
-	// Connect to the database. Configuration file is in /database/db.ini.
+	// Connect to the database. Configuration file is in /config/config.php
 	// Establish the connection first, if it's not set.
 	public function connect() {
 		if (!isset(self::$connection)) {
