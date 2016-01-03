@@ -8,6 +8,8 @@ require_once(DIR_COMMON . 'common.php');
 $navbar = "<a class='blog-nav-item' href='index.php'>Home</a>";
 $navbar .= "<a class='blog-nav-item' href='addpost.php'>Add Post</a>";
 $navbar .= "<a class='blog-nav-item' href='logout.php'>Logout</a>";
+
+die($_POST["Post_ID"]);
 ?>
 
 <!DOCTYPE html>
